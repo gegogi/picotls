@@ -34,13 +34,15 @@
 #include "picotls.h"
 #include "picotls/ffx.h"
 #include "picotls/minicrypto.h"
+#ifdef PTLS_HAVE_OPENSSL
 #include "picotls/openssl.h"
+#include <openssl/opensslv.h>
+#endif
 #ifndef _WINDOWS
 #ifdef PTLS_HAVE_FUSION
 #include "picotls/fusion.h"
 #endif
 #endif
-#include <openssl/opensslv.h>
 
 #ifdef _WINDOWS
 #include <bcrypt.h>
@@ -199,6 +201,7 @@ static int bench_run_aead(char *OS, char *HW, int basic_ref, uint64_t s0, const 
     /* Document library version as it may have impact on performance */
     p_version[0] = 0;
 
+#ifdef PTLS_HAVE_OPENSSL
     if (strcmp(provider, "openssl") == 0) {
         /*
          * OPENSSL_VERSION_NUMBER is a combination of the major, minor and patch version
@@ -217,6 +220,7 @@ static int bench_run_aead(char *OS, char *HW, int basic_ref, uint64_t s0, const 
         (void)sprintf(p_version, "%d.%d.%d%c", M, NN, FF, letter);
 #endif
     }
+#endif
 
     *s += s0;
 
@@ -273,11 +277,13 @@ static ptls_bench_entry_t aead_list[] = {
     {"fusion", "aes256gcm", &ptls_fusion_aes256gcm, &ptls_minicrypto_sha384, 1},
 #endif
 #endif
+#ifdef PTLS_HAVE_OPENSSL
 #if PTLS_OPENSSL_HAVE_CHACHA20_POLY1305
     {"openssl", "chacha20poly1305", &ptls_openssl_chacha20poly1305, &ptls_minicrypto_sha256, 1},
 #endif
     {"openssl", "aes128gcm", &ptls_openssl_aes128gcm, &ptls_minicrypto_sha256, 1},
     {"openssl", "aes256gcm", &ptls_openssl_aes256gcm, &ptls_minicrypto_sha384, 1},
+#endif
 #ifdef PTLS_HAVE_MBEDTLS
     {"mbedtls", "aes128gcm", &ptls_mbedtls_aes128gcm, &ptls_mbedtls_sha256, 1},
 #if defined(MBEDTLS_SHA384_C)

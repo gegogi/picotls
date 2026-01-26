@@ -124,7 +124,7 @@ pub fn build(b: *std.Build) void {
 
     minicrypto_module.addCSourceFiles(.{
         .files = minicrypto_library_files,
-        .flags = &.{ "-std=c99", "-Wall", "-Wno-shift-count-overflow" },
+        .flags = common_cflags,
     });
 
     minicrypto_module.addCSourceFiles(.{
@@ -208,7 +208,7 @@ pub fn build(b: *std.Build) void {
 
     test_module.addCSourceFiles(.{
         .files = minicrypto_library_files,
-        .flags = &.{ "-std=c99", "-Wall", "-Wno-shift-count-overflow" },
+        .flags = common_cflags,
     });
 
     test_module.addCSourceFiles(.{

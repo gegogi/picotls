@@ -8,23 +8,14 @@
 #if (defined(_WIN32) || defined(_WIN64))
 /* Windows */
 
-// use pragma syntax to prevent tweaking the linker script for getting CryptXYZ function
-#pragma comment(lib, "crypt32.lib")
-#pragma comment(lib, "advapi32.lib")
-
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <wincrypt.h>
+#include <bcrypt.h>
 
 static int default_RNG(uint8_t *dest, unsigned size) {
-    HCRYPTPROV prov;
-    if (!CryptAcquireContext(&prov, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
-        return 0;
-    }
-
-    CryptGenRandom(prov, size, (BYTE *)dest);
-    CryptReleaseContext(prov, 0);
-    return 1;
+    NTSTATUS status = BCryptGenRandom(NULL, (PUCHAR)dest, (ULONG)size, 
+                                       BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+    return BCRYPT_SUCCESS(status) ? 1 : 0;
 }
 #define default_RNG_defined 1
 
